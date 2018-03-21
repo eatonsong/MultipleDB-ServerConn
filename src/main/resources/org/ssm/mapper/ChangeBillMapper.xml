@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="org.ssm.mapper.ChangeBillMapper" >
+  <select id="testfind" resultType="java.lang.String"  >
+  	select insured_name
+    from tbl_policy where status='6'
+  </select>
+  <update id="changeBill" parameterType="org.ssm.model.Bill">
+  	update tbl_confirm_info con set con.prm =#{money}
+		where con.confirm_id in
+       (select info.confirm_id
+          from tbl_confirm_app_info info
+         where info.app_no = #{appNo} )
+  </update>
+  <delete id="deleteApp" parameterType="org.ssm.model.AppointDto">
+  	delete from tbl_core_appoint c where  c.department_code  like '${areaCode}%'
+  	<if test="appbaoliuList!=null">
+	  	<foreach collection="appbaoliuList" item="item" index="index"
+	            separator=" ">
+	  		and c.appoint_no != #{item}
+	    </foreach>
+	</if>
+  </delete>
+  <insert id="insertApp" parameterType="org.ssm.model.AppointDto" >
+  	  insert all
+        <foreach collection="appointList" item="item" index="index"
+            separator=" ">
+        	into tbl_core_appoint (DEPARTMENT_CODE, PRODUCT_NO, APPOINT_NO, SPECIAL_APPOINT, ADB_TM, VALIDING)
+			values
+        	 (#{item.appjigou}, #{item.appchanpin}, #{item.appdaima}, #{item.appneirong}, null, '1')
+        </foreach>
+        select 1 from dual
+  </insert>
+</mapper>
